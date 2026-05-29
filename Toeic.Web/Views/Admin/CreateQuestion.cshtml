@@ -1,0 +1,18 @@
+﻿@model Toeic.Web.Models.Admin.QuestionFormViewModel
+@{
+    ViewData["Title"] = "Create Question";
+}
+
+<h1>Create Question</h1>
+
+<form asp-action="CreateQuestion" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <partial name="_QuestionForm" model="Model" />
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Questions" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

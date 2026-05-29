@@ -1,0 +1,19 @@
+﻿@model Toeic.Web.Models.Admin.QuestionFormViewModel
+@{
+    ViewData["Title"] = "Edit Question";
+}
+
+<h1>Edit Question</h1>
+
+<form asp-action="EditQuestion" asp-route-id="@Model.Id" method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Id" type="hidden" />
+    <partial name="_QuestionForm" model="Model" />
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Questions" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

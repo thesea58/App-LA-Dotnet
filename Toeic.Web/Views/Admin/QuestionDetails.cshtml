@@ -1,0 +1,40 @@
+﻿@model Toeic.Domain.Entities.Question
+@{
+    ViewData["Title"] = "Question Details";
+}
+
+<h1>Question Details</h1>
+
+<div class="card p-3 mb-3">
+    <p><strong>Question:</strong> @Model.QuestionText</p>
+    <p><strong>Part:</strong> @Model.Part</p>
+    <p><strong>Skill:</strong> @Model.Skill</p>
+    <p><strong>Difficulty:</strong> @Model.Difficulty</p>
+    <p><strong>Topic:</strong> @Model.Topic</p>
+    <p><strong>GrammarTag:</strong> @Model.GrammarTag</p>
+    <p><strong>Explanation:</strong> @Model.Explanation</p>
+</div>
+
+<h3>Answer Options</h3>
+@if (!Model.AnswerOptions.Any())
+{
+    <p>No answer options found.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+    @foreach (var option in Model.AnswerOptions.OrderBy(x => x.Label))
+    {
+        <li class="list-group-item d-flex justify-content-between">
+            <span>@option.Label. @option.Text</span>
+            @if (option.IsCorrect)
+            {
+                <span class="badge text-bg-success">Correct</span>
+            }
+        </li>
+    }
+    </ul>
+}
+
+<a asp-action="EditQuestion" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<a asp-action="Questions" class="btn btn-secondary">Back</a>
