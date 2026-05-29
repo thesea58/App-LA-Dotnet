@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Toeic.Domain.Entities;
 using Toeic.Infrastructure.Identity;
 
 namespace Toeic.Infrastructure.Persistence;
@@ -11,5 +12,6 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 	{
 	}
 
-	// Day 4: DbContext now includes ASP.NET Core Identity tables.
+	// Day 4/6: Identity + TOEIC question bank.
+	public DbSet<Question> Questions => Set<Question>();
 }
