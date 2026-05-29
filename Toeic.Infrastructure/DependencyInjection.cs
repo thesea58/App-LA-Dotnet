@@ -31,6 +31,14 @@ public static class DependencyInjection
 			.AddDefaultUI()
 			.AddDefaultTokenProviders();
 
+		services.ConfigureApplicationCookie(options =>
+		{
+			options.LoginPath = "/Account/Login";
+			options.AccessDeniedPath = "/Account/AccessDenied";
+		});
+
+		services.AddScoped<IdentitySeeder>();
+
 		return services;
 	}
 }

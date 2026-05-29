@@ -1,4 +1,7 @@
-﻿using Toeic.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore;
+using Toeic.Infrastructure;
+using Toeic.Infrastructure.Identity;
+using Toeic.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +10,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+	var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	dbContext.Database.Migrate();
+
+	var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
+	await seeder.SeedRolesAsync();
+}
 
 if (!app.Environment.IsDevelopment())
 {

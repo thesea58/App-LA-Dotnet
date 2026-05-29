@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using Toeic.Infrastructure.Identity
 @inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
@@ -10,7 +9,7 @@
         <span class="nav-link text-dark">Hello @User.Identity?.Name</span>
     </li>
     <li class="nav-item">
-        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+        <form asp-controller="Account" asp-action="Logout" method="post">
             <button type="submit" class="btn btn-link nav-link text-dark">Logout</button>
         </form>
     </li>
@@ -18,10 +17,10 @@
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="@Url.Action("Index", "Dashboard")">Register</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Url.Action("Index", "Dashboard")">Register</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Url.Action("Index", "Dashboard")">Login</a>
+        <a class="nav-link text-dark" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Index", "Dashboard")">Login</a>
     </li>
 }
 </ul>
