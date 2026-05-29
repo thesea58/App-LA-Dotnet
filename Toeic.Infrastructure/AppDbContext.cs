@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Toeic.Infrastructure.Identity;
 
 namespace Toeic.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
 	public AppDbContext(DbContextOptions<AppDbContext> options)
 		: base(options)
 	{
 	}
 
-	// Chưa cần DbSet entity phức tạp ở Day 3.
+	// Day 4: DbContext now includes ASP.NET Core Identity tables.
 }
