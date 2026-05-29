@@ -70,3 +70,33 @@ else
         </tbody>
     </table>
 }
+
+<h3 class="mt-4">My Assignments</h3>
+@if (!Model.StudentAssignments.Any())
+{
+    <p>No assignments from your classes yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Class</th>
+                <th>Assignment</th>
+                <th>Mock Test</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.StudentAssignments)
+        {
+            <tr>
+                <td>@item.ClassName</td>
+                <td>@item.Title</td>
+                <td>@item.MockTestTitle</td>
+                <td>@item.DueDate.ToLocalTime()</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

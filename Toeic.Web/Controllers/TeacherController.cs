@@ -108,6 +108,29 @@ public class TeacherController : Controller
 			}).ToList()
 		};
 
+		vm.Assignments = await _dbContext.Assignments
+			.AsNoTracking()
+			.Include(a => a.MockTest)
+			.Where(a => a.ClassRoomId == id)
+			.OrderByDescending(a => a.CreatedAt)
+			.Select(a => new ClassAssignmentViewModel
+			{
+				Title = a.Title,
+				MockTestTitle = a.MockTest != null ? a.MockTest.Title : "(unknown)",
+				DueDate = a.DueDate
+			})
+			.ToListAsync();
+
+		vm.MockTests = await _dbContext.MockTests
+			.AsNoTracking()
+			.OrderBy(x => x.Title)
+			.Select(x => new MockTestOptionViewModel
+			{
+				Id = x.Id,
+				Title = x.Title
+			})
+			.ToListAsync();
+
 		return View(vm);
 	}
 
@@ -150,6 +173,43 @@ public class TeacherController : Controller
 		await _dbContext.SaveChangesAsync();
 
 		TempData["TeacherSuccess"] = "Student enrolled successfully.";
+		return RedirectToAction(nameof(Details), new { id });
+	}
+
+	[HttpPost("{id:int}/Assignments")]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> CreateAssignment(int id, int mockTestId, string title, DateTime dueDate)
+	{
+		var classRoom = await GetAuthorizedClassRoomAsync(id);
+		if (classRoom is null)
+		{
+			return NotFound();
+		}
+
+		if (string.IsNullOrWhiteSpace(title))
+		{
+			TempData["TeacherError"] = "Assignment title is required.";
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		var mockTestExists = await _dbContext.MockTests.AnyAsync(x => x.Id == mockTestId);
+		if (!mockTestExists)
+		{
+			TempData["TeacherError"] = "Mock test was not found.";
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		await _dbContext.Assignments.AddAsync(new Assignment
+		{
+			ClassRoomId = id,
+			MockTestId = mockTestId,
+			Title = title.Trim(),
+			DueDate = dueDate,
+			CreatedAt = DateTime.UtcNow
+		});
+		await _dbContext.SaveChangesAsync();
+
+		TempData["TeacherSuccess"] = "Assignment created successfully.";
 		return RedirectToAction(nameof(Details), new { id });
 	}
 

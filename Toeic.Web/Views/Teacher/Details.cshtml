@@ -26,6 +26,56 @@
     </div>
 </form>
 
+<h3>Create Assignment</h3>
+<form asp-action="CreateAssignment" asp-route-id="@Model.ClassRoom.Id" method="post" class="row g-2 mb-4">
+    <div class="col-md-4">
+        <input name="title" class="form-control" placeholder="Assignment title" required />
+    </div>
+    <div class="col-md-3">
+        <select name="mockTestId" class="form-select" required>
+            <option value="">Select mock test</option>
+            @foreach (var item in Model.MockTests)
+            {
+                <option value="@item.Id">@item.Title</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input name="dueDate" type="datetime-local" class="form-control" required />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Assign</button>
+    </div>
+</form>
+
+<h3>Assignments</h3>
+@if (!Model.Assignments.Any())
+{
+    <p>No assignments yet.</p>
+}
+else
+{
+    <table class="table table-striped mb-4">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Mock Test</th>
+                <th>Due Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var assignment in Model.Assignments)
+        {
+            <tr>
+                <td>@assignment.Title</td>
+                <td>@assignment.MockTestTitle</td>
+                <td>@assignment.DueDate.ToLocalTime()</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
 <h3>Enrolled Students</h3>
 @if (!Model.Students.Any())
 {

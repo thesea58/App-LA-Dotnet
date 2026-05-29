@@ -87,6 +87,21 @@ public class DashboardController : Controller
 
 		vm.Recommendations = recommendations;
 
+		vm.StudentAssignments = await _dbContext.Assignments
+			.Include(a => a.ClassRoom)
+			.Include(a => a.MockTest)
+			.AsNoTracking()
+			.Where(a => _dbContext.ClassEnrollments.Any(e => e.ClassRoomId == a.ClassRoomId && e.StudentId == userId))
+			.OrderBy(a => a.DueDate)
+			.Select(a => new StudentAssignmentViewModel
+			{
+				ClassName = a.ClassRoom != null ? a.ClassRoom.Name : "(unknown)",
+				Title = a.Title,
+				MockTestTitle = a.MockTest != null ? a.MockTest.Title : "(unknown)",
+				DueDate = a.DueDate
+			})
+			.ToListAsync();
+
 		return View(vm);
 	}
 }
