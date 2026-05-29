@@ -2,6 +2,7 @@
 using Toeic.Infrastructure;
 using Toeic.Infrastructure.Identity;
 using Toeic.Infrastructure.Persistence;
+using Toeic.Infrastructure.Persistence.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ using (var scope = app.Services.CreateScope())
 
 	var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
 	await seeder.SeedRolesAsync();
+	await QuestionSeeder.SeedPart5QuestionsAsync(dbContext);
 }
 
 if (!app.Environment.IsDevelopment())
