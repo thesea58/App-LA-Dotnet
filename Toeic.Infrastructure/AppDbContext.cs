@@ -14,6 +14,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
 	public DbSet<Question> Questions => Set<Question>();
 	public DbSet<AnswerOption> AnswerOptions => Set<AnswerOption>();
+	public DbSet<PracticeAttempt> PracticeAttempts => Set<PracticeAttempt>();
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
@@ -23,6 +24,12 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 			.HasOne(option => option.Question)
 			.WithMany(question => question.AnswerOptions)
 			.HasForeignKey(option => option.QuestionId)
+			.OnDelete(DeleteBehavior.Cascade);
+
+		builder.Entity<PracticeAttempt>()
+			.HasOne(attempt => attempt.Question)
+			.WithMany()
+			.HasForeignKey(attempt => attempt.QuestionId)
 			.OnDelete(DeleteBehavior.Cascade);
 	}
 }

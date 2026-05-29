@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Toeic.Domain.Entities;
 using Toeic.Domain.Enums;
 using Toeic.Infrastructure.Persistence;
 using Toeic.Web.Models.Practice;
@@ -84,6 +86,22 @@ public class PracticeController : Controller
 			SelectedAnswerOptionId = selectedAnswerOptionId,
 			CorrectAnswerOptionId = correctOption.Id
 		};
+
+		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		if (!string.IsNullOrWhiteSpace(userId))
+		{
+			var attempt = new PracticeAttempt
+			{
+				UserId = userId,
+				QuestionId = question.Id,
+				SelectedAnswerOptionId = selectedAnswerOptionId,
+				IsCorrect = vm.IsCorrect,
+				AnsweredAt = DateTime.UtcNow
+			};
+
+			await _dbContext.PracticeAttempts.AddAsync(attempt);
+			await _dbContext.SaveChangesAsync();
+		}
 
 		return View("QuestionResult", vm);
 	}
