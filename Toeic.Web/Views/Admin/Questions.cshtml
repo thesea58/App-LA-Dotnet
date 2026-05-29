@@ -1,0 +1,43 @@
+﻿@model IReadOnlyList<Toeic.Domain.Entities.Question>
+@{
+    ViewData["Title"] = "Manage Questions";
+}
+
+<h1>Question Management</h1>
+
+@if (!Model.Any())
+{
+    <p>No question records found.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Part</th>
+                    <th>Skill</th>
+                    <th>QuestionText</th>
+                    <th>Difficulty</th>
+                    <th>Topic</th>
+                    <th>GrammarTag</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Part</td>
+                    <td>@item.Skill</td>
+                    <td>@item.QuestionText</td>
+                    <td>@item.Difficulty</td>
+                    <td>@item.Topic</td>
+                    <td>@item.GrammarTag</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

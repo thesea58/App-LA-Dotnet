@@ -2,12 +2,7 @@
     ViewData["Title"] = "Admin";
 }
 
-<h1>Admin</h1>
+<h1>Admin Area</h1>
+<p>Only users with Admin role can access this section.</p>
 
-<p>This page will be used to manage TOEIC questions, vocabulary, and mock tests later.</p>
-
-<div class="card-grid">
-    <div class="feature-card">Question Management</div>
-    <div class="feature-card">Vocabulary Management</div>
-    <div class="feature-card">Mock Test Management</div>
-</div>
+<a class="btn btn-primary" asp-action="Questions">Manage Questions</a>
