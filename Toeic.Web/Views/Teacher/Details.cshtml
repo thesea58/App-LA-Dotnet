@@ -1,0 +1,10 @@
+﻿@model Toeic.Domain.Entities.ClassRoom
+@{
+    ViewData["Title"] = "Class Details";
+}
+
+<h1>@Model.Name</h1>
+<p>@Model.Description</p>
+<p><strong>Created:</strong> @Model.CreatedAt.ToLocalTime()</p>
+
+<a asp-action="Index" class="btn btn-secondary">Back to classes</a>

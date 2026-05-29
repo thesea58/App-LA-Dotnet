@@ -1,0 +1,38 @@
+﻿@model IReadOnlyList<Toeic.Domain.Entities.ClassRoom>
+@{
+    ViewData["Title"] = "Teacher Classes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Teacher Classes</h1>
+    <a class="btn btn-primary" asp-action="Create">Create Class</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p>No classes yet.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.CreatedAt.ToLocalTime()</td>
+                <td><a asp-action="Details" asp-route-id="@item.Id">Details</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

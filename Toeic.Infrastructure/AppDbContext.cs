@@ -20,6 +20,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 	public DbSet<MockTestQuestion> MockTestQuestions => Set<MockTestQuestion>();
 	public DbSet<MockTestAttempt> MockTestAttempts => Set<MockTestAttempt>();
 	public DbSet<MockTestAnswer> MockTestAnswers => Set<MockTestAnswer>();
+	public DbSet<ClassRoom> ClassRooms => Set<ClassRoom>();
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
