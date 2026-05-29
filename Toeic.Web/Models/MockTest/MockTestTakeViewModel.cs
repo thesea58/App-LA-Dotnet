@@ -9,6 +9,7 @@ public class MockTestTakeViewModel
 	public int TotalQuestions { get; set; }
 	public Question Question { get; set; } = null!;
 	public int? SelectedAnswerOptionId { get; set; }
+	public int RemainingSeconds { get; set; }
 }
 
 public class MockTestResultViewModel

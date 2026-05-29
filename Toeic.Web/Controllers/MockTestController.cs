@@ -65,6 +65,16 @@ public class MockTestController : Controller
 		{
 			return NotFound();
 		}
+		if (attempt.SubmittedAt is not null)
+		{
+			return RedirectToAction(nameof(Result), new { attemptId });
+		}
+
+		var test = await _dbContext.MockTests.AsNoTracking().FirstOrDefaultAsync(x => x.Id == attempt.MockTestId);
+		if (test is null)
+		{
+			return NotFound();
+		}
 
 		var totalQuestions = await _dbContext.MockTestQuestions
 			.CountAsync(x => x.MockTestId == attempt.MockTestId);
@@ -97,7 +107,8 @@ public class MockTestController : Controller
 			OrderNo = orderNo,
 			TotalQuestions = totalQuestions,
 			Question = mockQuestion.Question,
-			SelectedAnswerOptionId = selectedId
+			SelectedAnswerOptionId = selectedId,
+			RemainingSeconds = Math.Max(0, (int)(attempt.StartedAt.AddMinutes(test.DurationMinutes) - DateTime.UtcNow).TotalSeconds)
 		};
 
 		return View(vm);
@@ -111,6 +122,10 @@ public class MockTestController : Controller
 		if (attempt is null)
 		{
 			return NotFound();
+		}
+		if (attempt.SubmittedAt is not null)
+		{
+			return RedirectToAction(nameof(Result), new { attemptId });
 		}
 
 		var mockQuestion = await _dbContext.MockTestQuestions
@@ -158,11 +173,7 @@ public class MockTestController : Controller
 
 		if (isSubmit)
 		{
-			attempt.SubmittedAt = DateTime.UtcNow;
-			attempt.Score = await _dbContext.MockTestAnswers
-				.CountAsync(a => a.MockTestAttemptId == attemptId && a.IsCorrect);
-
-			await _dbContext.SaveChangesAsync();
+			await FinalizeAttemptAsync(attempt);
 			return RedirectToAction(nameof(Result), new { attemptId });
 		}
 
@@ -239,6 +250,24 @@ public class MockTestController : Controller
 		return View(vm);
 	}
 
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> AutoSubmit(int attemptId)
+	{
+		var attempt = await GetUserAttemptAsync(attemptId);
+		if (attempt is null)
+		{
+			return NotFound();
+		}
+
+		if (attempt.SubmittedAt is null)
+		{
+			await FinalizeAttemptAsync(attempt);
+		}
+
+		return RedirectToAction(nameof(Result), new { attemptId });
+	}
+
 	private async Task<MockTestAttempt?> GetUserAttemptAsync(int attemptId)
 	{
 		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -248,5 +277,13 @@ public class MockTestController : Controller
 		}
 
 		return await _dbContext.MockTestAttempts.FirstOrDefaultAsync(x => x.Id == attemptId && x.UserId == userId);
+	}
+
+	private async Task FinalizeAttemptAsync(MockTestAttempt attempt)
+	{
+		attempt.SubmittedAt = DateTime.UtcNow;
+		attempt.Score = await _dbContext.MockTestAnswers
+			.CountAsync(a => a.MockTestAttemptId == attempt.Id && a.IsCorrect);
+		await _dbContext.SaveChangesAsync();
 	}
 }

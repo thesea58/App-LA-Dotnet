@@ -31,4 +31,47 @@
         .ToList();
 }
 
+<div class="alert alert-warning d-inline-flex align-items-center gap-2" id="timerContainer" data-seconds="@Model.RemainingSeconds">
+    <strong>Time left:</strong> <span id="timerText">--:--</span>
+</div>
+
+<form id="autoSubmitForm" asp-action="AutoSubmit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="attemptId" value="@Model.AttemptId" />
+</form>
+
 <partial name="_TestPlayer" model="player" />
+
+@section Scripts {
+<script>
+(function () {
+    const timerEl = document.getElementById('timerContainer');
+    if (!timerEl) return;
+
+    let remaining = Number(timerEl.dataset.seconds || 0);
+    const timerText = document.getElementById('timerText');
+    const autoSubmitForm = document.getElementById('autoSubmitForm');
+
+    function format(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function tick() {
+        if (!timerText) return;
+        timerText.textContent = format(Math.max(remaining, 0));
+
+        if (remaining <= 0) {
+            if (autoSubmitForm) autoSubmitForm.submit();
+            return;
+        }
+
+        remaining -= 1;
+        setTimeout(tick, 1000);
+    }
+
+    tick();
+})();
+</script>
+}
