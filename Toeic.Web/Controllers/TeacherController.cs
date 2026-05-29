@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -14,10 +15,12 @@ namespace Toeic.Web.Controllers;
 public class TeacherController : Controller
 {
 	private readonly AppDbContext _dbContext;
+	private readonly UserManager<ApplicationUser> _userManager;
 
-	public TeacherController(AppDbContext dbContext)
+	public TeacherController(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
 	{
 		_dbContext = dbContext;
+		_userManager = userManager;
 	}
 
 	[HttpGet("")]
@@ -77,24 +80,99 @@ public class TeacherController : Controller
 	[HttpGet("{id:int}")]
 	public async Task<IActionResult> Details(int id)
 	{
-		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-		if (string.IsNullOrWhiteSpace(userId))
-		{
-			return Challenge();
-		}
-
-		var classRoom = await _dbContext.ClassRooms.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+		var classRoom = await GetAuthorizedClassRoomAsync(id);
 		if (classRoom is null)
 		{
 			return NotFound();
 		}
 
+		var enrollments = await _dbContext.ClassEnrollments
+			.AsNoTracking()
+			.Where(x => x.ClassRoomId == id)
+			.OrderByDescending(x => x.EnrolledAt)
+			.ToListAsync();
+
+		var studentIds = enrollments.Select(x => x.StudentId).Distinct().ToList();
+		var users = await _userManager.Users
+			.Where(u => studentIds.Contains(u.Id))
+			.ToDictionaryAsync(x => x.Id, x => x.Email ?? string.Empty);
+
+		var vm = new ClassDetailsViewModel
+		{
+			ClassRoom = classRoom,
+			Students = enrollments.Select(e => new ClassStudentViewModel
+			{
+				StudentId = e.StudentId,
+				Email = users.TryGetValue(e.StudentId, out var email) ? email : "(unknown)",
+				EnrolledAt = e.EnrolledAt
+			}).ToList()
+		};
+
+		return View(vm);
+	}
+
+	[HttpPost("{id:int}/Enroll")]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> EnrollStudent(int id, string studentEmail)
+	{
+		var classRoom = await GetAuthorizedClassRoomAsync(id);
+		if (classRoom is null)
+		{
+			return NotFound();
+		}
+
+		if (string.IsNullOrWhiteSpace(studentEmail))
+		{
+			TempData["TeacherError"] = "Student email is required.";
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		var user = await _userManager.FindByEmailAsync(studentEmail.Trim());
+		if (user is null)
+		{
+			TempData["TeacherError"] = "Student email not found.";
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		var exists = await _dbContext.ClassEnrollments.AnyAsync(x => x.ClassRoomId == id && x.StudentId == user.Id);
+		if (exists)
+		{
+			TempData["TeacherError"] = "Student is already enrolled in this class.";
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		await _dbContext.ClassEnrollments.AddAsync(new ClassEnrollment
+		{
+			ClassRoomId = id,
+			StudentId = user.Id,
+			EnrolledAt = DateTime.UtcNow
+		});
+		await _dbContext.SaveChangesAsync();
+
+		TempData["TeacherSuccess"] = "Student enrolled successfully.";
+		return RedirectToAction(nameof(Details), new { id });
+	}
+
+	private async Task<ClassRoom?> GetAuthorizedClassRoomAsync(int id)
+	{
+		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		if (string.IsNullOrWhiteSpace(userId))
+		{
+			return null;
+		}
+
+		var classRoom = await _dbContext.ClassRooms.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+		if (classRoom is null)
+		{
+			return null;
+		}
+
 		var isAdmin = User.IsInRole(AppRoles.Admin);
 		if (!isAdmin && classRoom.TeacherId != userId)
 		{
-			return Forbid();
+			return null;
 		}
 
-		return View(classRoom);
+		return classRoom;
 	}
 }

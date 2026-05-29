@@ -21,6 +21,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 	public DbSet<MockTestAttempt> MockTestAttempts => Set<MockTestAttempt>();
 	public DbSet<MockTestAnswer> MockTestAnswers => Set<MockTestAnswer>();
 	public DbSet<ClassRoom> ClassRooms => Set<ClassRoom>();
+	public DbSet<ClassEnrollment> ClassEnrollments => Set<ClassEnrollment>();
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
@@ -67,5 +68,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 			.WithMany()
 			.HasForeignKey(answer => answer.QuestionId)
 			.OnDelete(DeleteBehavior.Restrict);
+
+		builder.Entity<ClassEnrollment>()
+			.HasOne(enrollment => enrollment.ClassRoom)
+			.WithMany()
+			.HasForeignKey(enrollment => enrollment.ClassRoomId)
+			.OnDelete(DeleteBehavior.Cascade);
+
+		builder.Entity<ClassEnrollment>()
+			.HasIndex(enrollment => new { enrollment.ClassRoomId, enrollment.StudentId })
+			.IsUnique();
 	}
 }
