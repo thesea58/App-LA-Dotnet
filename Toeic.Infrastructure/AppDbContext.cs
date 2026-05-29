@@ -12,6 +12,17 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 	{
 	}
 
-	// Day 4/6: Identity + TOEIC question bank.
 	public DbSet<Question> Questions => Set<Question>();
+	public DbSet<AnswerOption> AnswerOptions => Set<AnswerOption>();
+
+	protected override void OnModelCreating(ModelBuilder builder)
+	{
+		base.OnModelCreating(builder);
+
+		builder.Entity<AnswerOption>()
+			.HasOne(option => option.Question)
+			.WithMany(question => question.AnswerOptions)
+			.HasForeignKey(option => option.QuestionId)
+			.OnDelete(DeleteBehavior.Cascade);
+	}
 }

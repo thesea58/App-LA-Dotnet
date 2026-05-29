@@ -13,4 +13,6 @@ public class Question
 	public string Topic { get; set; } = string.Empty;
 	public string GrammarTag { get; set; } = string.Empty;
 	public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+	public ICollection<AnswerOption> AnswerOptions { get; set; } = new List<AnswerOption>();
 }
