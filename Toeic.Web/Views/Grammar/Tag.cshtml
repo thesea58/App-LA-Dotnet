@@ -1,0 +1,26 @@
+﻿@model Toeic.Web.Models.Grammar.GrammarClinicTagDetailViewModel
+@{
+    ViewData["Title"] = "Grammar Tag Detail";
+}
+
+<h1>Grammar Clinic: @Model.GrammarTag</h1>
+
+@if (!Model.WrongAttempts.Any())
+{
+    <p>No incorrect attempts for this tag.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+    @foreach (var attempt in Model.WrongAttempts)
+    {
+        <li class="list-group-item">
+            <p><strong>Question:</strong> @attempt.Question?.QuestionText</p>
+            <p><strong>Explanation:</strong> @attempt.Question?.Explanation</p>
+            <p><strong>Answered At:</strong> @attempt.AnsweredAt.ToLocalTime()</p>
+        </li>
+    }
+    </ul>
+}
+
+<a asp-action="Index" class="btn btn-secondary">Back to Grammar Clinic</a>

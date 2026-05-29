@@ -1,14 +1,23 @@
-﻿@{
-    ViewData["Title"] = "Grammar";
+﻿@model IReadOnlyList<Toeic.Web.Models.Grammar.GrammarClinicGroupViewModel>
+@{
+    ViewData["Title"] = "Grammar Clinic";
 }
 
-<h1>Grammar</h1>
+<h1>Grammar Clinic</h1>
 
-<p>This page will contain grammar lessons and grammar review for TOEIC learners.</p>
-
-<div class="card-grid">
-    <div class="feature-card">Part of Speech</div>
-    <div class="feature-card">Verb Tense</div>
-    <div class="feature-card">Preposition</div>
-    <div class="feature-card">Conjunction</div>
-</div>
+@if (!Model.Any())
+{
+    <p>You have no incorrect practice attempts yet.</p>
+}
+else
+{
+    <div class="card-grid">
+    @foreach (var item in Model)
+    {
+        <a class="feature-card text-decoration-none text-dark" asp-action="Tag" asp-route-tag="@item.GrammarTag">
+            <h3>@item.GrammarTag</h3>
+            <p>Wrong answers: @item.WrongCount</p>
+        </a>
+    }
+    </div>
+}
