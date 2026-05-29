@@ -2,33 +2,33 @@
 @{
     ViewData["Title"] = "Mock Test";
     var isLast = Model.OrderNo >= Model.TotalQuestions;
+    var player = new Toeic.Web.Models.Common.TestPlayerViewModel
+    {
+        Title = "TOEIC Mini Test 01",
+        QuestionText = Model.Question.QuestionText,
+        CurrentNumber = Model.OrderNo,
+        TotalQuestions = Model.TotalQuestions,
+        SelectedOptionId = Model.SelectedAnswerOptionId,
+        FormAction = Url.Action("Answer", "MockTest") ?? "/MockTest/Answer",
+        HiddenFields = new Dictionary<string, string>
+        {
+            ["attemptId"] = Model.AttemptId.ToString(),
+            ["orderNo"] = Model.OrderNo.ToString()
+        },
+        PreviousUrl = Model.OrderNo > 1 ? Url.Action("Take", "MockTest", new { attemptId = Model.AttemptId, orderNo = Model.OrderNo - 1 }) : null,
+        NextCommandValue = isLast ? "submit" : "next",
+        NextButtonLabel = isLast ? "Submit Test" : "Next"
+    };
+
+    player.Options = Model.Question.AnswerOptions
+        .OrderBy(x => x.Label)
+        .Select(x => new Toeic.Web.Models.Common.TestPlayerOptionViewModel
+        {
+            Id = x.Id,
+            Label = x.Label,
+            Text = x.Text
+        })
+        .ToList();
 }
 
-<h1>TOEIC Mini Test 01</h1>
-<p>Question @Model.OrderNo / @Model.TotalQuestions</p>
-
-<form asp-action="Answer" method="post" class="col-lg-8">
-    <input type="hidden" name="attemptId" value="@Model.AttemptId" />
-    <input type="hidden" name="orderNo" value="@Model.OrderNo" />
-
-    <div class="card p-3 mb-3">
-        <p><strong>@Model.Question.QuestionText</strong></p>
-
-        @foreach (var option in Model.Question.AnswerOptions.OrderBy(x => x.Label))
-        {
-            <div class="form-check mb-1">
-                <input class="form-check-input" type="radio" name="selectedAnswerOptionId" id="opt_@option.Id" value="@option.Id" checked="@(Model.SelectedAnswerOptionId == option.Id ? "checked" : null)" required />
-                <label class="form-check-label" for="opt_@option.Id">@option.Label. @option.Text</label>
-            </div>
-        }
-    </div>
-
-    @if (!isLast)
-    {
-        <button type="submit" class="btn btn-primary" name="command" value="next">Next</button>
-    }
-    else
-    {
-        <button type="submit" class="btn btn-success" name="command" value="submit">Submit Test</button>
-    }
-</form>
+<partial name="_TestPlayer" model="player" />

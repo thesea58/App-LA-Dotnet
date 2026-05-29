@@ -148,6 +148,12 @@ public class MockTestController : Controller
 		await _dbContext.SaveChangesAsync();
 
 		var totalQuestions = await _dbContext.MockTestQuestions.CountAsync(x => x.MockTestId == attempt.MockTestId);
+		if (string.Equals(command, "prev", StringComparison.OrdinalIgnoreCase))
+		{
+			var previousOrder = Math.Max(1, orderNo - 1);
+			return RedirectToAction(nameof(Take), new { attemptId, orderNo = previousOrder });
+		}
+
 		var isSubmit = string.Equals(command, "submit", StringComparison.OrdinalIgnoreCase) || orderNo >= totalQuestions;
 
 		if (isSubmit)

@@ -79,3 +79,11 @@ body {
     margin-bottom: 8px;
     font-size: 20px;
 }
+
+.test-player {
+    max-width: 840px;
+}
+
+.test-player .progress {
+    height: 10px;
+}

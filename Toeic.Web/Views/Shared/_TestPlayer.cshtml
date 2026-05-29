@@ -1,0 +1,43 @@
+﻿@model Toeic.Web.Models.Common.TestPlayerViewModel
+@{
+    var progress = Model.TotalQuestions == 0 ? 0 : (double)Model.CurrentNumber / Model.TotalQuestions * 100;
+}
+
+<div class="test-player">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h5 mb-0">@Model.Title</h2>
+        <span>@Model.CurrentNumber / @Model.TotalQuestions</span>
+    </div>
+
+    <div class="progress mb-3" role="progressbar" aria-label="progress" aria-valuenow="@Model.CurrentNumber" aria-valuemin="0" aria-valuemax="@Model.TotalQuestions">
+        <div class="progress-bar" style="width:@progress.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+    </div>
+
+    <form method="post" action="@Model.FormAction">
+        @Html.AntiForgeryToken()
+        @foreach (var field in Model.HiddenFields)
+        {
+            <input type="hidden" name="@field.Key" value="@field.Value" />
+        }
+
+        <div class="feature-card mb-3">
+            <p class="fw-semibold">@Model.QuestionText</p>
+
+            @foreach (var option in Model.Options)
+            {
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="selectedAnswerOptionId" id="opt_@option.Id" value="@option.Id" checked="@(Model.SelectedOptionId == option.Id ? "checked" : null)" required />
+                    <label class="form-check-label" for="opt_@option.Id">@option.Label. @option.Text</label>
+                </div>
+            }
+        </div>
+
+        <div class="d-flex gap-2">
+            @if (!string.IsNullOrWhiteSpace(Model.PreviousUrl))
+            {
+                <a href="@Model.PreviousUrl" class="btn btn-outline-secondary">Previous</a>
+            }
+            <button type="submit" class="btn btn-primary" name="command" value="@Model.NextCommandValue">@Model.NextButtonLabel</button>
+        </div>
+    </form>
+</div>

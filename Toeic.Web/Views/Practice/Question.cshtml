@@ -1,27 +1,33 @@
 ﻿@model Toeic.Web.Models.Practice.PracticeQuestionViewModel
 @{
     ViewData["Title"] = "Practice Question";
+    var player = new Toeic.Web.Models.Common.TestPlayerViewModel
+    {
+        Title = "Practice",
+        QuestionText = Model.Question.QuestionText,
+        CurrentNumber = 1,
+        TotalQuestions = 1,
+        SelectedOptionId = Model.SelectedAnswerOptionId,
+        FormAction = Url.Action("Submit", "Practice") ?? "/Practice/Submit",
+        HiddenFields = new Dictionary<string, string>
+        {
+            ["questionId"] = Model.Question.Id.ToString()
+        },
+        NextCommandValue = "submit",
+        NextButtonLabel = "Submit"
+    };
+
+    player.Options = Model.Question.AnswerOptions
+        .OrderBy(x => x.Label)
+        .Select(x => new Toeic.Web.Models.Common.TestPlayerOptionViewModel
+        {
+            Id = x.Id,
+            Label = x.Label,
+            Text = x.Text
+        })
+        .ToList();
 }
 
-<h1>Practice Question</h1>
+<partial name="_TestPlayer" model="player" />
 
-<form asp-action="Submit" method="post" class="col-lg-8">
-    <input type="hidden" name="questionId" value="@Model.Question.Id" />
-
-    <div class="card p-3 mb-3">
-        <p><strong>@Model.Question.QuestionText</strong></p>
-
-        @foreach (var option in Model.Question.AnswerOptions.OrderBy(o => o.Label))
-        {
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="radio" name="selectedAnswerOptionId" id="option_@option.Id" value="@option.Id" required />
-                <label class="form-check-label" for="option_@option.Id">
-                    @option.Label. @option.Text
-                </label>
-            </div>
-        }
-    </div>
-
-    <button type="submit" class="btn btn-primary">Submit</button>
-    <a class="btn btn-secondary" asp-action="Part" asp-route-partNumber="@((int)Model.Question.Part)">Back to Part</a>
-</form>
+<a class="btn btn-link mt-2" asp-action="Part" asp-route-partNumber="@((int)Model.Question.Part)">Back to Part</a>
