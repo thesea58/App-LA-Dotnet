@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Toeic.Application/Toeic.Application.csproj" />
+  <Project Path="Toeic.Domain/Toeic.Domain.csproj" />
+  <Project Path="Toeic.Infrastructure/Toeic.Infrastructure.csproj" />
+  <Project Path="Toeic.Tests/Toeic.Tests.csproj" />
+  <Project Path="Toeic.Web/Toeic.Web.csproj" />
+</Solution>
