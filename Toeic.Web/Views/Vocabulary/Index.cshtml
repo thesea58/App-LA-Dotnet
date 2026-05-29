@@ -1,16 +1,37 @@
-﻿@{
+﻿@model IReadOnlyList<Toeic.Domain.Entities.VocabularyEntry>
+@{
     ViewData["Title"] = "Vocabulary";
 }
 
 <h1>Vocabulary</h1>
 
-<p>This page will show TOEIC vocabulary by topic.</p>
-
-<div class="card-grid">
-    <div class="feature-card">Office</div>
-    <div class="feature-card">Meeting</div>
-    <div class="feature-card">Travel</div>
-    <div class="feature-card">Finance</div>
-    <div class="feature-card">Recruitment</div>
-    <div class="feature-card">Shopping</div>
-</div>
+@if (!Model.Any())
+{
+    <p>No vocabulary entries found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Word</th>
+                <th>Meaning (VI)</th>
+                <th>Part of Speech</th>
+                <th>Topic</th>
+                <th>Example</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Word</td>
+                <td>@item.MeaningVi</td>
+                <td>@item.PartOfSpeech</td>
+                <td>@item.Topic</td>
+                <td>@item.ExampleSentence</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

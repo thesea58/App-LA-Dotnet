@@ -20,6 +20,7 @@ using (var scope = app.Services.CreateScope())
 	var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
 	await seeder.SeedRolesAsync();
 	await QuestionSeeder.SeedPart5QuestionsAsync(dbContext);
+	await VocabularySeeder.SeedVocabularyAsync(dbContext);
 }
 
 if (!app.Environment.IsDevelopment())

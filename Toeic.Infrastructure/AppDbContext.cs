@@ -15,6 +15,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 	public DbSet<Question> Questions => Set<Question>();
 	public DbSet<AnswerOption> AnswerOptions => Set<AnswerOption>();
 	public DbSet<PracticeAttempt> PracticeAttempts => Set<PracticeAttempt>();
+	public DbSet<VocabularyEntry> VocabularyEntries => Set<VocabularyEntry>();
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
