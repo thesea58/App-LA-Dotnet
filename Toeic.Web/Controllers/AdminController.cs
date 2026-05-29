@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using Toeic.Domain.Entities;
+using Toeic.Domain.Enums;
 using Toeic.Infrastructure.Identity;
 using Toeic.Infrastructure.Persistence;
 using Toeic.Web.Models.Admin;
@@ -166,5 +168,139 @@ public class AdminController : Controller
 		_dbContext.Questions.Remove(question);
 		await _dbContext.SaveChangesAsync();
 		return RedirectToAction(nameof(Questions));
+	}
+
+	[HttpGet("/Admin/QuestionImport")]
+	public IActionResult QuestionImport()
+	{
+		return View(new QuestionImportViewModel());
+	}
+
+	[HttpPost("/Admin/QuestionImport")]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> QuestionImport(QuestionImportViewModel model)
+	{
+		if (!ModelState.IsValid)
+		{
+			return View(model);
+		}
+
+		List<QuestionImportItemDto>? importItems;
+		try
+		{
+			importItems = JsonSerializer.Deserialize<List<QuestionImportItemDto>>(
+				model.JsonPayload,
+				new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+		}
+		catch (JsonException)
+		{
+			ModelState.AddModelError(string.Empty, "Invalid JSON format.");
+			return View(model);
+		}
+
+		if (importItems is null || importItems.Count == 0)
+		{
+			ModelState.AddModelError(string.Empty, "JSON must contain at least one question.");
+			return View(model);
+		}
+
+		var questionsToAdd = new List<Question>();
+		for (var i = 0; i < importItems.Count; i++)
+		{
+			var item = importItems[i];
+			if (string.IsNullOrWhiteSpace(item.QuestionText))
+			{
+				ModelState.AddModelError(string.Empty, $"Item #{i + 1}: QuestionText is required.");
+				continue;
+			}
+
+			if (item.Options is null || item.Options.Count < 2)
+			{
+				ModelState.AddModelError(string.Empty, $"Item #{i + 1}: at least 2 options are required.");
+				continue;
+			}
+
+			if (item.Options.Count(x => x.IsCorrect) != 1)
+			{
+				ModelState.AddModelError(string.Empty, $"Item #{i + 1}: exactly 1 correct option is required.");
+				continue;
+			}
+
+			if (!TryParsePart(item.Part, out var part) || !TryParseSkill(item.Skill, out var skill))
+			{
+				ModelState.AddModelError(string.Empty, $"Item #{i + 1}: invalid Part or Skill.");
+				continue;
+			}
+
+			var question = new Question
+			{
+				QuestionText = item.QuestionText.Trim(),
+				Part = part,
+				Skill = skill,
+				Explanation = item.Explanation ?? string.Empty,
+				Difficulty = item.Difficulty,
+				Topic = item.Topic ?? string.Empty,
+				GrammarTag = item.GrammarTag ?? string.Empty,
+				CreatedAt = DateTime.UtcNow
+			};
+
+			foreach (var option in item.Options)
+			{
+				question.AnswerOptions.Add(new AnswerOption
+				{
+					Label = option.Label,
+					Text = option.Text,
+					IsCorrect = option.IsCorrect
+				});
+			}
+
+			questionsToAdd.Add(question);
+		}
+
+		if (!ModelState.IsValid)
+		{
+			return View(model);
+		}
+
+		await _dbContext.Questions.AddRangeAsync(questionsToAdd);
+		await _dbContext.SaveChangesAsync();
+
+		model.ResultMessage = $"Imported {questionsToAdd.Count} questions successfully.";
+		model.JsonPayload = string.Empty;
+		return View(model);
+	}
+
+	private static bool TryParsePart(string value, out ToeicPart part)
+	{
+		if (Enum.TryParse<ToeicPart>(value, true, out part))
+		{
+			return true;
+		}
+
+		if (int.TryParse(value, out var partNumber) && partNumber >= 1 && partNumber <= 7)
+		{
+			part = (ToeicPart)partNumber;
+			return true;
+		}
+
+		part = default;
+		return false;
+	}
+
+	private static bool TryParseSkill(string value, out ToeicSkill skill)
+	{
+		if (Enum.TryParse<ToeicSkill>(value, true, out skill))
+		{
+			return true;
+		}
+
+		if (int.TryParse(value, out var skillNumber) && Enum.IsDefined(typeof(ToeicSkill), skillNumber))
+		{
+			skill = (ToeicSkill)skillNumber;
+			return true;
+		}
+
+		skill = default;
+		return false;
 	}
 }
