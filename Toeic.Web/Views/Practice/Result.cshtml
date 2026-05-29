@@ -1,0 +1,79 @@
+﻿@model Toeic.Web.Models.Practice.PracticeSummaryViewModel
+@{
+    ViewData["Title"] = "Practice Result";
+}
+
+<h1>Practice Result</h1>
+
+<div class="card-grid">
+    <div class="feature-card">
+        <h3>Total Answered</h3>
+        <p>@Model.TotalAnswered</p>
+    </div>
+    <div class="feature-card">
+        <h3>Total Correct</h3>
+        <p>@Model.TotalCorrect</p>
+    </div>
+    <div class="feature-card">
+        <h3>Accuracy</h3>
+        <p>@Model.AccuracyPercentage%</p>
+    </div>
+</div>
+
+<h3 class="mt-4">By Part</h3>
+@if (!Model.PartStats.Any())
+{
+    <p>No practice data yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Part</th>
+                <th>Total</th>
+                <th>Correct</th>
+                <th>Accuracy</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.PartStats)
+        {
+            <tr>
+                <td>@item.Part</td>
+                <td>@item.Total</td>
+                <td>@item.Correct</td>
+                <td>@item.AccuracyPercentage%</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<h3 class="mt-4">By Grammar Tag</h3>
+@if (!Model.GrammarTagStats.Any())
+{
+    <p>No grammar-tag data yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>GrammarTag</th>
+                <th>Total</th>
+                <th>Incorrect</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.GrammarTagStats)
+        {
+            <tr>
+                <td>@item.GrammarTag</td>
+                <td>@item.Total</td>
+                <td>@item.Incorrect</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

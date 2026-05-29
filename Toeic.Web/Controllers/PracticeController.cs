@@ -105,4 +105,58 @@ public class PracticeController : Controller
 
 		return View("QuestionResult", vm);
 	}
+
+	[HttpGet("/Practice/Result")]
+	public async Task<IActionResult> Result()
+	{
+		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		if (string.IsNullOrWhiteSpace(userId))
+		{
+			return Challenge();
+		}
+
+		var attempts = await _dbContext.PracticeAttempts
+			.Include(a => a.Question)
+			.AsNoTracking()
+			.Where(a => a.UserId == userId)
+			.ToListAsync();
+
+		var totalAnswered = attempts.Count;
+		var totalCorrect = attempts.Count(a => a.IsCorrect);
+
+		var partStats = attempts
+			.Where(a => a.Question is not null)
+			.GroupBy(a => a.Question!.Part)
+			.Select(g => new PracticePartStatViewModel
+			{
+				Part = g.Key.ToString(),
+				Total = g.Count(),
+				Correct = g.Count(x => x.IsCorrect)
+			})
+			.OrderBy(x => x.Part)
+			.ToList();
+
+		var grammarTagStats = attempts
+			.Where(a => a.Question is not null && !string.IsNullOrWhiteSpace(a.Question!.GrammarTag))
+			.GroupBy(a => a.Question!.GrammarTag)
+			.Select(g => new PracticeGrammarTagStatViewModel
+			{
+				GrammarTag = g.Key,
+				Total = g.Count(),
+				Incorrect = g.Count(x => !x.IsCorrect)
+			})
+			.OrderByDescending(x => x.Incorrect)
+			.ThenBy(x => x.GrammarTag)
+			.ToList();
+
+		var vm = new PracticeSummaryViewModel
+		{
+			TotalAnswered = totalAnswered,
+			TotalCorrect = totalCorrect,
+			PartStats = partStats,
+			GrammarTagStats = grammarTagStats
+		};
+
+		return View(vm);
+	}
 }
