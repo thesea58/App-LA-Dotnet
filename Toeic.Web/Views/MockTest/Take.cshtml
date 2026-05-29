@@ -7,23 +7,28 @@
 <h1>TOEIC Mini Test 01</h1>
 <p>Question @Model.OrderNo / @Model.TotalQuestions</p>
 
-<div class="card p-3 mb-3">
-    <p><strong>@Model.Question.QuestionText</strong></p>
+<form asp-action="Answer" method="post" class="col-lg-8">
+    <input type="hidden" name="attemptId" value="@Model.AttemptId" />
+    <input type="hidden" name="orderNo" value="@Model.OrderNo" />
 
-    @foreach (var option in Model.Question.AnswerOptions.OrderBy(x => x.Label))
+    <div class="card p-3 mb-3">
+        <p><strong>@Model.Question.QuestionText</strong></p>
+
+        @foreach (var option in Model.Question.AnswerOptions.OrderBy(x => x.Label))
+        {
+            <div class="form-check mb-1">
+                <input class="form-check-input" type="radio" name="selectedAnswerOptionId" id="opt_@option.Id" value="@option.Id" checked="@(Model.SelectedAnswerOptionId == option.Id ? "checked" : null)" required />
+                <label class="form-check-label" for="opt_@option.Id">@option.Label. @option.Text</label>
+            </div>
+        }
+    </div>
+
+    @if (!isLast)
     {
-        <div class="form-check mb-1">
-            <input class="form-check-input" type="radio" disabled />
-            <label class="form-check-label">@option.Label. @option.Text</label>
-        </div>
+        <button type="submit" class="btn btn-primary" name="command" value="next">Next</button>
     }
-</div>
-
-@if (!isLast)
-{
-    <a class="btn btn-primary" asp-action="Take" asp-route-attemptId="@Model.AttemptId" asp-route-orderNo="@(Model.OrderNo + 1)">Next</a>
-}
-else
-{
-    <a class="btn btn-success" asp-action="Index">Finish (Submit in Day 20)</a>
-}
+    else
+    {
+        <button type="submit" class="btn btn-success" name="command" value="submit">Submit Test</button>
+    }
+</form>

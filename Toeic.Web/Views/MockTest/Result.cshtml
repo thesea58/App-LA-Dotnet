@@ -1,0 +1,33 @@
+﻿@model Toeic.Web.Models.MockTest.MockTestResultViewModel
+@{
+    ViewData["Title"] = "Mock Test Result";
+}
+
+<h1>@Model.TestTitle - Result</h1>
+
+<div class="feature-card mb-3">
+    <p><strong>Correct:</strong> @Model.CorrectCount / @Model.TotalQuestions</p>
+    <p><strong>Accuracy:</strong> @Model.AccuracyPercentage%</p>
+</div>
+
+<h3>Incorrect Questions</h3>
+@if (!Model.WrongItems.Any())
+{
+    <p>Great job. No incorrect answers.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+    @foreach (var item in Model.WrongItems)
+    {
+        <li class="list-group-item">
+            <p><strong>Q@item.QuestionId:</strong> @item.QuestionText</p>
+            <p><strong>Your answer:</strong> @item.SelectedAnswer</p>
+            <p><strong>Correct answer:</strong> @item.CorrectAnswer</p>
+            <p><strong>Explanation:</strong> @item.Explanation</p>
+        </li>
+    }
+    </ul>
+}
+
+<a class="btn btn-secondary" asp-action="Index">Back to Mock Tests</a>
