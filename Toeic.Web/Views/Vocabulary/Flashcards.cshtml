@@ -1,0 +1,29 @@
+﻿@model Toeic.Web.Models.Vocabulary.FlashcardViewModel
+@{
+    ViewData["Title"] = "Flashcards";
+    var nextIndex = (Model.Index + 1) % Model.Total;
+}
+
+<h1>Vocabulary Flashcards</h1>
+<p>Card @(Model.Index + 1) / @Model.Total</p>
+
+<div class="feature-card" style="max-width: 680px;">
+    <h3>@Model.Entry.Word</h3>
+    <p><strong>Part of Speech:</strong> @Model.Entry.PartOfSpeech</p>
+
+    @if (Model.ShowBack)
+    {
+        <hr />
+        <p><strong>Meaning:</strong> @Model.Entry.MeaningVi</p>
+        <p><strong>Example:</strong> @Model.Entry.ExampleSentence</p>
+    }
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    @if (!Model.ShowBack)
+    {
+        <a class="btn btn-primary" asp-action="Flashcards" asp-route-index="@Model.Index" asp-route-showBack="true">Show Answer</a>
+    }
+    <a class="btn btn-outline-primary" asp-action="Flashcards" asp-route-index="@nextIndex" asp-route-showBack="false">Next</a>
+    <a class="btn btn-secondary" asp-action="Index">Back to Vocabulary List</a>
+</div>
