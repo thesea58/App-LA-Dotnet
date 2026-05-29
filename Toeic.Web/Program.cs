@@ -21,6 +21,7 @@ using (var scope = app.Services.CreateScope())
 	await seeder.SeedRolesAsync();
 	await QuestionSeeder.SeedPart5QuestionsAsync(dbContext);
 	await VocabularySeeder.SeedVocabularyAsync(dbContext);
+	await MockTestSeeder.SeedMiniTestAsync(dbContext);
 }
 
 if (!app.Environment.IsDevelopment())

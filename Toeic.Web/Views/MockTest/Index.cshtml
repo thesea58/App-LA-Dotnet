@@ -1,12 +1,26 @@
-﻿@{
+﻿@model IReadOnlyList<Toeic.Domain.Entities.MockTest>
+@{
     ViewData["Title"] = "Mock Test";
 }
 
 <h1>Mock Test</h1>
 
-<p>This page will provide TOEIC mini tests and full mock tests in later steps.</p>
-
-<div class="feature-card">
-    <h3>TOEIC Mini Test</h3>
-    <p>Coming soon.</p>
-</div>
+@if (!Model.Any())
+{
+    <p>No mock tests available.</p>
+}
+else
+{
+    @foreach (var test in Model)
+    {
+        <div class="feature-card mb-3">
+            <h3>@test.Title</h3>
+            <p>@test.Description</p>
+            <p><strong>Duration:</strong> @test.DurationMinutes minutes</p>
+            <form asp-action="Start" method="post">
+                <input type="hidden" name="mockTestId" value="@test.Id" />
+                <button type="submit" class="btn btn-primary">Start</button>
+            </form>
+        </div>
+    }
+}
