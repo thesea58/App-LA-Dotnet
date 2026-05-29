@@ -8,6 +8,7 @@ public class DashboardViewModel
 	public int MockTestsCompleted { get; set; }
 	public int? LatestMockTestScore { get; set; }
 	public string WeakestGrammarTag { get; set; } = "N/A";
+	public IReadOnlyList<string> Recommendations { get; set; } = [];
 }
 
 public class DashboardPartStatViewModel

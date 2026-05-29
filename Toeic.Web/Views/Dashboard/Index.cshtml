@@ -28,6 +28,23 @@
     </div>
 </div>
 
+<h3 class="mt-4">Recommended Next Study</h3>
+<div class="feature-card">
+@if (!Model.Recommendations.Any())
+{
+    <p>No recommendation yet. Keep practicing.</p>
+}
+else
+{
+    <ul class="mb-0">
+    @foreach (var item in Model.Recommendations)
+    {
+        <li>@item</li>
+    }
+    </ul>
+}
+</div>
+
 <h3 class="mt-4">Accuracy by Part</h3>
 @if (!Model.PartStats.Any())
 {

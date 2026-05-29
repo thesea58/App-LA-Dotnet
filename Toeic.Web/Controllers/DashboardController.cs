@@ -68,6 +68,25 @@ public class DashboardController : Controller
 			WeakestGrammarTag = weakestGrammarTag
 		};
 
+		var recommendations = new List<string>();
+		var weakestPart = partStats.OrderBy(x => x.Accuracy).FirstOrDefault();
+		if (weakestPart is not null)
+		{
+			recommendations.Add($"Practice more questions in {weakestPart.Part}.");
+		}
+
+		if (!string.Equals(weakestGrammarTag, "N/A", StringComparison.OrdinalIgnoreCase))
+		{
+			recommendations.Add($"Open Grammar Clinic for '{weakestGrammarTag}'.");
+		}
+
+		if (submittedMocks.Count == 0)
+		{
+			recommendations.Add("Start TOEIC Mini Test 01 to benchmark your level.");
+		}
+
+		vm.Recommendations = recommendations;
+
 		return View(vm);
 	}
 }
