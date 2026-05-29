@@ -17,6 +17,9 @@ else
     {
         <li class="list-group-item">
             <strong>Q@question.Id:</strong> @question.QuestionText
+            <div class="mt-2">
+                <a class="btn btn-sm btn-outline-primary" asp-action="Question" asp-route-id="@question.Id">Practice This Question</a>
+            </div>
         </li>
     }
     </ul>

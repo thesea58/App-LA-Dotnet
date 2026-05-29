@@ -1,0 +1,22 @@
+﻿@model Toeic.Web.Models.Practice.PracticeResultViewModel
+@{
+    ViewData["Title"] = "Practice Result";
+    var selected = Model.Question.AnswerOptions.FirstOrDefault(x => x.Id == Model.SelectedAnswerOptionId);
+    var correct = Model.Question.AnswerOptions.First(x => x.Id == Model.CorrectAnswerOptionId);
+}
+
+<h1>Practice Result</h1>
+
+<div class="alert @(Model.IsCorrect ? "alert-success" : "alert-danger")">
+    @(Model.IsCorrect ? "Correct!" : "Incorrect.")
+</div>
+
+<div class="card p-3 mb-3">
+    <p><strong>Question:</strong> @Model.Question.QuestionText</p>
+    <p><strong>Your answer:</strong> @selected?.Label. @selected?.Text</p>
+    <p><strong>Correct answer:</strong> @correct.Label. @correct.Text</p>
+    <p><strong>Explanation:</strong> @Model.Question.Explanation</p>
+</div>
+
+<a class="btn btn-primary" asp-action="Question" asp-route-id="@Model.Question.Id">Try Again</a>
+<a class="btn btn-secondary" asp-action="Part" asp-route-partNumber="@((int)Model.Question.Part)">Back to Part</a>
