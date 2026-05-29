@@ -1,0 +1,25 @@
+﻿@model IReadOnlyList<Toeic.Domain.Entities.Question>
+@{
+    ViewData["Title"] = $"Practice Part {ViewData["PartNumber"]}";
+    var partNumber = (int)ViewData["PartNumber"]!;
+}
+
+<h1>Practice Part @partNumber</h1>
+
+@if (!Model.Any())
+{
+    <p>No questions available for this part yet.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+    @foreach (var question in Model)
+    {
+        <li class="list-group-item">
+            <strong>Q@question.Id:</strong> @question.QuestionText
+        </li>
+    }
+    </ul>
+}
+
+<a asp-action="Index" class="btn btn-secondary">Back to parts</a>

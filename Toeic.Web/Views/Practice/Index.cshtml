@@ -4,14 +4,14 @@
 
 <h1>Practice</h1>
 
-<p>Select TOEIC parts and practice questions. Question data will be added later.</p>
+<p>Select a TOEIC part to begin practice.</p>
 
 <div class="card-grid">
-    <div class="feature-card">Part 1 - Photographs</div>
-    <div class="feature-card">Part 2 - Question Response</div>
-    <div class="feature-card">Part 3 - Conversations</div>
-    <div class="feature-card">Part 4 - Talks</div>
-    <div class="feature-card">Part 5 - Incomplete Sentences</div>
-    <div class="feature-card">Part 6 - Text Completion</div>
-    <div class="feature-card">Part 7 - Reading Comprehension</div>
+    @for (var i = 1; i <= 7; i++)
+    {
+        <a class="feature-card text-decoration-none text-dark" asp-action="Part" asp-route-partNumber="@i">
+            <strong>Part @i</strong>
+            <div>Open practice set</div>
+        </a>
+    }
 </div>
