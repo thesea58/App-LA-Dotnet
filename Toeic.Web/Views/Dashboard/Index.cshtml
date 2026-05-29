@@ -1,22 +1,55 @@
-﻿@{
+﻿@model Toeic.Web.Models.Dashboard.DashboardViewModel
+@{
     ViewData["Title"] = "Dashboard";
 }
 
 <h1>Dashboard</h1>
 
-<p>This page will show TOEIC learning progress in future steps.</p>
-
 <div class="card-grid">
     <div class="feature-card">
         <h3>Total Practice</h3>
-        <p>Coming soon.</p>
+        <p>@Model.TotalPracticeQuestions questions</p>
     </div>
     <div class="feature-card">
-        <h3>Accuracy</h3>
-        <p>Coming soon.</p>
+        <h3>Overall Accuracy</h3>
+        <p>@Model.OverallAccuracy%</p>
     </div>
     <div class="feature-card">
-        <h3>Recommended Study</h3>
-        <p>Coming soon.</p>
+        <h3>Mock Tests Completed</h3>
+        <p>@Model.MockTestsCompleted</p>
+    </div>
+    <div class="feature-card">
+        <h3>Latest Mock Test Score</h3>
+        <p>@(Model.LatestMockTestScore?.ToString() ?? "N/A")</p>
+    </div>
+    <div class="feature-card">
+        <h3>Weakest GrammarTag</h3>
+        <p>@Model.WeakestGrammarTag</p>
     </div>
 </div>
+
+<h3 class="mt-4">Accuracy by Part</h3>
+@if (!Model.PartStats.Any())
+{
+    <p>No part statistics yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Part</th>
+                <th>Accuracy</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.PartStats)
+        {
+            <tr>
+                <td>@item.Part</td>
+                <td>@item.Accuracy%</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
