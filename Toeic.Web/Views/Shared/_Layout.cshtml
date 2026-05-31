@@ -45,3 +45,6 @@
         @RenderBody()
     </main>
 </div>
+
+@* Allows views such as Login/Register to inject page-specific scripts. *@
+@await RenderSectionAsync("Scripts", required: false)
